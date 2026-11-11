@@ -1,22 +1,37 @@
-import { createServer } from "node:http";
+import express from "express";
+
+const app = express();
+app.use(express.json());
 
 const citations = [
   { id: 1, texte: "Apprendre en pratiquant.", auteur: "Équipe du TP" },
 ];
+let prochainId = 2;
 
-const server = createServer((req, res) => {
-  // Exemple : traiter une méthode et un chemin.
-  if (req.method === "GET" && req.url === "/") {
-    res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });
-    return res.end("Bienvenue dans l’API de citations !");
-  }
-
-  // TODO 1 : répondre à GET /citations avec le tableau au format JSON.
-  // TODO 2 : renvoyer 404 et un message JSON pour les autres requêtes.
-  res.writeHead(501);
-  res.end("À compléter");
+app.get("/citations", (req, res) => {
+  res.json(citations);
 });
 
-server.listen(3000, () => {
-  console.log("Serveur disponible sur http://localhost:3000");
+app.get("/citations/:id", (req, res) => {
+  // TODO : convertir l’ID en nombre, chercher la citation et gérer son absence.
+  res.status(501).json({ message: "À compléter" });
+});
+
+app.post("/citations", (req, res) => {
+  // TODO : valider req.body, créer une citation et incrémenter prochainId.
+  res.status(501).json({ message: "À compléter" });
+});
+
+app.put("/citations/:id", (req, res) => {
+  // TODO : retrouver la citation et remplacer texte et auteur après validation.
+  res.status(501).json({ message: "À compléter" });
+});
+
+app.delete("/citations/:id", (req, res) => {
+  // TODO : retirer la citation du tableau et terminer la réponse.
+  res.status(501).json({ message: "À compléter" });
+});
+
+app.listen(3000, () => {
+  console.log("API disponible sur http://localhost:3000");
 });

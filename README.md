@@ -1,21 +1,31 @@
-# 01 · Ton premier serveur Node.js
+# 02 · Un CRUD avec Express
 
-Lis le [parcours et les consignes de rendu](PARCOURS.md), puis lance `npm start`. Aucune dépendance à installer pour cette branche.
+[Parcours et rendu](PARCOURS.md) · Lance `npm install` puis `npm start`.
 
 ## Mini-cours
 
-Node.js exécute du JavaScript hors du navigateur. Le module natif `node:http` permet de créer un serveur. À chaque requête, `req` fournit notamment la méthode et l’URL. Avec `res`, tu choisis le statut, les en-têtes et le corps de la réponse. `JSON.stringify` transforme un tableau ou un objet JavaScript en texte JSON.
+Express associe une méthode et un chemin à une fonction. `express.json()` lit le corps JSON d’une requête et le rend accessible dans `req.body`. Le segment `:id` est accessible sous forme de texte dans `req.params.id`. Pour chercher dans le tableau, convertis-le en nombre, puis utilise `find` ou `findIndex`. Le tableau est recréé à chaque démarrage du serveur.
 
 ## À toi de jouer
 
-1. Lance le serveur et observe la réponse de `GET /`.
-2. Dans `server.js`, ajoute `GET /citations`. Renvoie le tableau fourni avec le statut 200 et un en-tête `Content-Type: application/json`.
-3. Remplace la réponse 501 par un statut 404 et le JSON `{"message":"Route introuvable"}`. Après chaque réponse, le traitement doit s’arrêter.
+`GET /citations` fonctionne déjà. Complète les quatre autres routes dans cet ordre.
+
+| Requête | Réponse attendue |
+|---|---|
+| `GET /citations/:id` | 200 et la citation, ou 404 si elle est absente |
+| `POST /citations` | 201 et la citation avec un nouvel identifiant |
+| `PUT /citations/:id` | 200 et la citation mise à jour, ou 404 |
+| `DELETE /citations/:id` | 204 avec un corps vide, ou 404 |
+
+Pour POST et PUT, vérifie que `texte` et `auteur` sont des chaînes non vides après `trim()`. Sinon, renvoie 400 et un message JSON. Pour PUT, garde le même identifiant. Utilise `prochainId` pour que les identifiants supprimés ne soient pas réutilisés pendant l’exécution.
 
 ```bash
-curl -i http://localhost:3000/
-curl -i http://localhost:3000/citations
-curl -i http://localhost:3000/inconnue
+curl -i http://localhost:3000/citations/1
+curl -i -X POST http://localhost:3000/citations -H 'Content-Type: application/json' -d '{"texte":"On progresse en essayant.","auteur":"Ada"}'
+curl -i -X POST http://localhost:3000/citations -H 'Content-Type: application/json' -d '{"texte":" ","auteur":"Ada"}'
+curl -i -X PUT http://localhost:3000/citations/1 -H 'Content-Type: application/json' -d '{"texte":"Nouvelle version","auteur":"Ada"}'
+curl -i -X DELETE http://localhost:3000/citations/1
+curl -i http://localhost:3000/citations/1
 ```
 
-Dans `RENDU.md`, relève les résultats de `/citations` et `/inconnue`. Explique la différence entre `req` et `res`, puis indique à quoi sert `Content-Type`.
+Dans `RENDU.md`, relève le POST invalide et le GET après suppression. Explique d’où viennent les valeurs de `req.params.id` et `req.body`.
