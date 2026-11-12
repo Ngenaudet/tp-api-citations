@@ -1,22 +1,32 @@
-import { createServer } from "node:http";
+import express from "express";
+import { fileURLToPath } from "node:url";
+
+const app = express();
+app.set("view engine", "ejs");
+app.set("views", fileURLToPath(new URL("./views/", import.meta.url)));
 
 const citations = [
   { id: 1, texte: "Apprendre en pratiquant.", auteur: "Équipe du TP" },
 ];
 
-const server = createServer((req, res) => {
-  // Exemple : traiter une méthode et un chemin.
-  if (req.method === "GET" && req.url === "/") {
-    res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });
-    return res.end("Bienvenue dans l’API de citations !");
-  }
-
-  // TODO 1 : répondre à GET /citations avec le tableau au format JSON.
-  // TODO 2 : renvoyer 404 et un message JSON pour les autres requêtes.
-  res.writeHead(501);
-  res.end("À compléter");
+app.get("/", (req, res) => {
+  res.render("index", { citations });
 });
 
-server.listen(3000, () => {
+app.get("/ping", (req, res) => {
+  res.type("text/plain").send("Serveur de citations prêt.");
+});
+
+app.get("/citations", (req, res) => {
+  // TODO : renvoyer le tableau de citations avec res.json().
+  res.status(501).json({ message: "À compléter" });
+});
+
+app.use((req, res) => {
+  // TODO : renvoyer un statut 404 et le message « Route introuvable » en JSON.
+  res.status(501).json({ message: "À compléter" });
+});
+
+app.listen(3000, () => {
   console.log("Serveur disponible sur http://localhost:3000");
 });
