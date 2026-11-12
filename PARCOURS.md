@@ -2,9 +2,9 @@
 
 | Branche | Durée indicative | Objectif |
 |---|---:|---|
-| `01-node-http` | 45 min | Découvrir les réponses HTTP avec Express et EJS |
-| `02-express-crud` | 75 min | Construire un CRUD en mémoire |
-| `03-mongodb-mongoose` | 90 min | Connecter Atlas et persister les citations |
+| `01-node-http` | 30 min | Découvrir les réponses HTTP avec Express et EJS |
+| `02-express-crud` | 60 min | Construire un CRUD en mémoire |
+| `03-mongodb-mongoose` | 60 min | Connecter Atlas et persister les citations |
 | Rendu | 15 min | Vérifier les trois branches sur GitHub |
 
 ## Démarrer et rendre le TP
