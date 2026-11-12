@@ -1,45 +1,63 @@
-# 01 · Premier serveur Node.js avec Express et EJS
+# 03 · Enregistrer les citations dans MongoDB Atlas
 
-Lis le [parcours et les consignes de rendu](PARCOURS.md), puis lance `npm install` et `npm start`.
+[Parcours et rendu](PARCOURS.md) · Lance `npm install`.
 
-## Mini-cours · De la requête à la réponse
+## Prépare Atlas
 
-| Route | Méthode Express | Résultat |
-|---|---|---|
-| `GET /` | `res.render("index", { citations })` | Une page HTML générée par EJS |
-| `GET /ping` | `res.send()` | Un message en texte brut |
-| `GET /citations` | `res.json()` | Le tableau de citations au format JSON |
+1. Ouvre ton projet Atlas et sélectionne ton cluster. Crée un utilisateur de base de données avec des droits de lecture et d’écriture pour le TP.
+2. Dans les paramètres d’accès réseau, ajoute l’adresse IP publique actuelle depuis laquelle tu travailles.
+3. Ouvre **Connect → Drivers** pour ton cluster et copie l’URI Node.js. Copie `.env.example` vers `.env` et complète `MONGODB_URI` en remplaçant les valeurs de l’utilisateur de base de données. Si le mot de passe contient des caractères réservés, encode-les dans l’URI.
+4. Vérifie que `git check-ignore .env` affiche `.env`. Garde le fichier `.env.example` vide de tout identifiant de connexion.
 
-Express associe une méthode HTTP et un chemin à une fonction. `req` représente la requête du client et `res` permet de construire la réponse. Avec `res.json()`, Express sérialise le tableau en JSON et ajoute l’en-tête adapté.
+[Documentation de connexion MongoDB Atlas](https://www.mongodb.com/docs/atlas/connect-to-database-deployment/)
 
-### Lire une requête et y répondre
+## Voir le résultat dans le navigateur
 
-Quand tu ouvres `/ping`, le navigateur envoie une requête `GET /ping`. Express cherche une route avec cette méthode et ce chemin. Dans la fonction de la route, `req` contient les informations envoyées par le client. Avec `res`, tu choisis le statut et le contenu de la réponse.
+Après avoir complété le schéma et la connexion Atlas, lance `npm start` et ouvre [la page EJS](http://localhost:3000/). Express lit les citations avec `Citation.find()` puis passe la liste à EJS avec `res.render()`. Le navigateur reçoit directement la page HTML.
 
-Voici une route d’exemple qui renvoie un objet JSON.
+Ajoute une citation avec le formulaire. Le navigateur envoie un POST à `/ajouter-citation` et `express.urlencoded()` rend les champs disponibles dans `req.body`. Après l’enregistrement dans MongoDB, Express redirige le navigateur vers `/` pour afficher la liste à jour. L’affichage et l’ajout fonctionnent sans `fetch()`.
+
+Pour les exercices de l’API JSON ci-dessous, utilise curl, Postman ou Bruno. Tu peux aussi redémarrer le serveur puis rouvrir la page EJS pour vérifier que la citation ajoutée avec le formulaire a bien été conservée.
+
+## Mini-cours · Du tableau JavaScript à MongoDB
+
+Une **collection** regroupe des documents. Chaque citation est un document avec un `_id` attribué par MongoDB. Le **schéma** Mongoose décrit les champs et leurs règles. Le **modèle** permet de lire et d’écrire dans la collection. Par exemple, cette déclaration décrit une chaîne obligatoire dont les espaces en début et en fin sont retirés.
 
 ```js
-app.get("/exemple", (req, res) => {
-  res.status(200).json({ message: "Bonjour" });
-});
+titre: { type: String, required: true, trim: true }
 ```
 
-`200` indique que la requête a réussi. Si aucune route ne traite la requête, Express arrive au dernier `app.use()`. C’est là que tu renvoies `404` et un message. Place ce middleware après les routes.
+Dans le TP, applique cette structure aux champs `texte` et `auteur`. La validation des entrées HTTP permet aussi de vérifier que les valeurs reçues sont bien des chaînes avant de les transmettre à Mongoose.
 
-### Reconnaître le format reçu
+### Attendre la base de données
 
-L’en-tête `Content-Type` indique au navigateur le format du contenu renvoyé. La commande `curl -i` affiche les en-têtes avant le corps de la réponse. Dans le code de `/ping`, `res.type("text/plain")` définit le format texte. `res.json()` définit automatiquement le format JSON. Sur `/`, `res.render()` transmet les citations à la vue EJS et Express renvoie le HTML généré.
+`mongoose.connect()` renvoie une promesse. Dans `demarrer()`, place `await mongoose.connect(...)` avant `app.listen()`. Le serveur commence ainsi à accepter les requêtes une fois la connexion établie. L’URI vient de `process.env.MONGODB_URI` et l’option `dbName` choisit la base.
 
-## Exercice
+| Opération | Méthode Mongoose | Résultat attendu |
+|---|---|---|
+| Lister | `await Citation.find()` | Un tableau de documents, éventuellement vide |
+| Créer | `await Citation.create({ texte, auteur })` | Le document enregistré avec son `_id` |
+| Chercher par ID | `await Citation.findById(id)` | Le document trouvé ou `null` |
 
-1. Ouvre [la page EJS](http://localhost:3000/) dans ton navigateur. Repère dans `views/index.ejs` la boucle qui affiche les citations et les expressions `<%= ... %>` qui insèrent leurs valeurs.
-2. Dans `server.js`, fais renvoyer le tableau par `GET /citations` avec `res.json()`. Vérifie que le statut est 200.
-3. Dans le dernier `app.use()`, renvoie un statut 404 et le JSON `{"message":"Route introuvable"}` pour les routes inconnues.
+Avant `findById()`, utilise `mongoose.isObjectIdOrHexString(id)` pour vérifier le format. Un format invalide donne `400`. Si le format est valide mais que la recherche renvoie `null`, réponds `404`.
+
+### Suivre le trajet du formulaire EJS
+
+Le navigateur demande `/`. Express lit la collection et EJS transforme les citations en HTML. Quand tu envoies le formulaire, les champs arrivent dans `req.body` grâce à `express.urlencoded()`. Une fois la citation enregistrée, la redirection `303` demande au navigateur de refaire un `GET /`. La page est alors reconstruite à partir de la liste mise à jour. Pour un POST JSON, c’est `express.json()` qui lit le corps de la requête.
+
+## À toi de jouer
+
+1. Déclare les champs `texte` et `auteur` dans le schéma Mongoose de `server.js` avec `String`, `required` et `trim`.
+2. Complète la connexion avant le démarrage du serveur avec `process.env.MONGODB_URI` et l’option `dbName` réglée sur `tp_citations`. Lance `npm start` et vérifie que `GET /citations` renvoie un tableau.
+3. Ajoute le POST avec `Citation.create`. Enregistre uniquement `texte` et `auteur`. Vérifie comme à la branche précédente que ce sont des chaînes non vides. Réponds 201 avec le document créé, ou 400 si les données sont invalides.
+4. Ajoute `GET /citations/:id` avec `Citation.findById`. Utilise `mongoose.isObjectIdOrHexString` pour renvoyer 400 quand l’identifiant est mal formé et 404 quand il est valide mais absent.
+5. Bonus si tu as le temps. Ajoute PUT et DELETE. Pour PUT, valide les deux champs, applique les validateurs Mongoose à la mise à jour et renvoie le document modifié. Pour DELETE, renvoie 204 sans corps. Les deux routes reprennent les règles 400 et 404 du GET par identifiant.
 
 ```bash
-curl -i http://localhost:3000/ping
+curl -i -X POST http://localhost:3000/citations -H 'Content-Type: application/json' -d '{"texte":"Je reste après le redémarrage.","auteur":"Ada"}'
 curl -i http://localhost:3000/citations
-curl -i http://localhost:3000/inconnue
+curl -i http://localhost:3000/citations/invalide
+curl -i http://localhost:3000/citations/000000000000000000000000
 ```
 
-Dans `RENDU.md`, note le code HTTP et le contenu de la réponse pour `/citations` et `/inconnue`. Explique à quoi servent `req` et `res`. Avec `curl -i`, relève la valeur de `Content-Type` pour `/ping` et `/citations`. Quel format chaque route renvoie-t-elle ?
+Copie le `_id` du POST, arrête le serveur, relance `npm start`, puis retrouve la citation sur `/citations/<id>`. Dans `RENDU.md`, indique le résultat du POST et du GET après redémarrage. Explique pourquoi la citation survit au redémarrage et comment tu distingues un identifiant invalide d’une citation absente.
