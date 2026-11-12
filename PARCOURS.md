@@ -1,5 +1,7 @@
 # Une matinée pour construire une API de citations
 
+Prévoir environ quatre heures, avec une pause et du temps pour les problèmes de connexion.
+
 | Branche | Durée indicative | Objectif |
 |---|---:|---|
 | `01-node-http` | 45 min | Découvrir les réponses HTTP avec Express et EJS |

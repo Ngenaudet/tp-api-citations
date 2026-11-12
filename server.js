@@ -1,5 +1,10 @@
 import express from "express";
 import { fileURLToPath } from "node:url";
+import mongoose from "mongoose";
+const citationSchema = new mongoose.Schema({
+  // TODO : déclarer texte et auteur comme chaînes requises et nettoyées.
+});
+const Citation = mongoose.model("Citation", citationSchema);
 
 const app = express();
 app.set("view engine", "ejs");
@@ -11,8 +16,8 @@ const citations = [
 ];
 let prochainId = 2;
 
-app.get("/", (req, res) => {
-  res.render("index", { citations });
+  await Citation.create({ texte: texte.trim(), auteur: auteur.trim() });
+  res.redirect(303, "/");
 });
 
 app.get("/ping", (req, res) => {
