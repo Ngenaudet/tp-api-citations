@@ -4,7 +4,7 @@ Prévoir environ quatre heures, avec une pause et du temps pour les problèmes d
 
 | Branche | Durée indicative | Objectif |
 |---|---:|---|
-| `01-node-http` | 45 min | Comprendre une requête et une réponse HTTP |
+| `01-node-http` | 45 min | Découvrir les réponses HTTP avec Express et EJS |
 | `02-express-crud` | 75 min | Construire un CRUD en mémoire |
 | `03-mongodb-mongoose` | 90 min | Connecter Atlas et persister les citations |
 | Rendu | 15 min | Vérifier les trois branches sur GitHub |

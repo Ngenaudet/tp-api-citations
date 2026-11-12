@@ -2,6 +2,10 @@
 
 [Parcours et rendu](PARCOURS.md) · Lance `npm install` puis `npm start`.
 
+## Voir le résultat dans le navigateur
+
+Ouvre [la page EJS](http://localhost:3000/) après avoir démarré le serveur. Rafraîchis-la après une requête d’ajout, de modification ou de suppression pour voir la liste à jour. Les requêtes CRUD se font avec curl, Postman ou Bruno. La route `/ping` renvoie du texte avec `res.send()`, et les routes de l’API utilisent `res.json()` pour les réponses JSON.
+
 ## Mini-cours
 
 Express associe une méthode et un chemin à une fonction. `express.json()` lit le corps JSON d’une requête et le rend accessible dans `req.body`. Le segment `:id` est accessible sous forme de texte dans `req.params.id`. Pour chercher dans le tableau, convertis-le en nombre, puis utilise `find` ou `findIndex`. Le tableau est recréé à chaque démarrage du serveur.
