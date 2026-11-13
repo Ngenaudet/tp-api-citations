@@ -1,3 +1,12 @@
+/* Deux points bloquent le démarrage de ton server.js :
+
+Supprime le marqueur @@ -13,72 +15,146 @@. Il vient de l’affichage des différences dans Git et provoque une erreur de syntaxe.
+
+Avant les routes, crée l’application avec const app = express(), configure le moteur EJS et le dossier views, puis ajoute app.use(express.json()) et app.use(express.urlencoded({ extended: false })). Le premier lit le JSON envoyé à l’API, le second lit les champs du formulaire.
+
+Une fois ces corrections faites, lance node --check server.js, puis npm start. Ajoute une citation depuis le formulaire, redémarre le serveur et recharge la page. Si la citation est toujours là, tu as vérifié qu’elle est bien enregistrée dans MongoDB. */
+
+
 import express from "express";
 import { fileURLToPath } from "node:url";
 import mongoose from "mongoose";
